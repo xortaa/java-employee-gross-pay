@@ -18,8 +18,6 @@ public class Manager {
 
         int grossPay = rate * hoursWorked + allowance;
 
-        System.out.println(grossPay);
-
         return grossPay;
 
     }

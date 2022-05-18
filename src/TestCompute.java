@@ -20,6 +20,8 @@ class Frame extends JFrame {
     int grossPay;
     String[] natureOptions = { "field", "office" };
     String[] positions = { "manager", "supervisor", "employee" };
+    boolean nameAllow = false;
+    boolean hoursAllow = false;
 
     Frame() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -54,62 +56,75 @@ class Frame extends JFrame {
         panel4.add(hoursTextField);
 
         JButton button = new JButton("Submit");
+
+        
         button.addActionListener(event -> {
-            if (nameTextField.getText().length() != 0) {
-                name = nameTextField.getText();
-            } else {
-                JOptionPane.showMessageDialog(null, "name input has to be not blank", "error",
-                        JOptionPane.WARNING_MESSAGE);
-                System.exit(0);
-            }
 
-            natureOfWork = natureComboBox.getSelectedItem().toString();
+            do { 
+                if (nameTextField.getText().length() != 0) {
+                    name = nameTextField.getText();
+                    nameAllow = true;
+                } else {
+                    JOptionPane.showMessageDialog(null, "name input has to be not blank", "error",
+                            JOptionPane.WARNING_MESSAGE);
+                    // System.exit(0);
+                    nameAllow = false;
+                }
+    
+                natureOfWork = natureComboBox.getSelectedItem().toString();
+    
+                if (natureOfWork == "field") {
+                    allowance = 1000;
+                } else {
+                    allowance = 0;
+                }
+    
+                position = positionComboBox.getSelectedItem().toString();
+    
+                String hours = hoursTextField.getText();
+    
+                try {
+                    hoursWorked = Integer.parseInt(hours);
+                    hoursAllow = true;
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(null, "hours worked input has to be an integer or not blank", "error",
+                            JOptionPane.WARNING_MESSAGE);
+                    // System.exit(0);
+                    hoursAllow = false;
+    
+                }
+    
+                if (position == "manager") {
+                    Manager manager = new Manager(natureOfWork, hoursWorked);
+                    grossPay = manager.grossPay();
+                    rate = 1000;
+                } else if (position == "supervisor") {
+                    Supervisor supervisor = new Supervisor(natureOfWork, hoursWorked);
+                    grossPay = supervisor.grossPay();
+                    rate = 700;
+                } else if (position == "employee") {
+                    Employee employee = new Employee(natureOfWork, hoursWorked);
+                    grossPay = employee.grossPay();
+                    rate = 300;
+                }
+                
+            } while (!nameAllow && !hoursAllow );
 
-            if (natureOfWork == "field") {
-                allowance = 1000;
-            } else {
-                allowance = 0;
-            }
-
-            position = positionComboBox.getSelectedItem().toString();
-
-            String hours = hoursTextField.getText();
-
-            try {
-                hoursWorked = Integer.parseInt(hours);
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "hours worked input has to be an integer or not blank", "error",
-                        JOptionPane.WARNING_MESSAGE);
-                System.exit(0);
-
-            }
-
-            if (position == "manager") {
-                Manager manager = new Manager(natureOfWork, hoursWorked);
-                grossPay = manager.grossPay();
-                rate = 1000;
-            } else if (position == "supervisor") {
-                Supervisor supervisor = new Supervisor(natureOfWork, hoursWorked);
-                grossPay = supervisor.grossPay();
-                rate = 700;
-            } else if (position == "employee") {
-                Employee employee = new Employee(natureOfWork, hoursWorked);
-                grossPay = employee.grossPay();
-                rate = 300;
-            }
-
-            try {
-                BufferedWriter writer = new BufferedWriter(new FileWriter("lab5.csv"));
-                writer.write("Name: " + name);
-                writer.write("\nNature of work: " + natureOfWork);
-                writer.write("\nPosition: " + position);
-                writer.write("\nRate: " + rate);
-                writer.write("\nNumber of hours worked: " + hoursWorked);
-                writer.write("\nAllowance: " + allowance);
-                writer.write("\nGross Pay: " + grossPay);
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            
+            if (nameAllow && hoursAllow) {
+                try {
+                    BufferedWriter writer = new BufferedWriter(new FileWriter("lab5.csv"));
+                    writer.write("Name: " + name);
+                    writer.write("\nNature of work: " + natureOfWork);
+                    writer.write("\nPosition: " + position);
+                    writer.write("\nRate: " + rate);
+                    writer.write("\nNumber of hours worked: " + hoursWorked);
+                    writer.write("\nAllowance: " + allowance);
+                    writer.write("\nGross Pay: " + grossPay);
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
         });
